@@ -37,7 +37,18 @@ const TooltipContainer = styled.div(props => ({
   ...evaluateStyle(props.userStyle, props)
 }));
 
-const KEY_BLACKLIST = new Set(['vertices', 'base', 'style', 'state', 'index', 'id', 'object_id']);
+const KEY_BLACKLIST = new Set([
+  'vertices',
+  'base',
+  'style',
+  'state',
+  'index',
+  'id',
+  'object_id',
+  'type',
+  'tags',
+  'classes'
+]);
 
 class HoverTooltip extends PureComponent {
   _renderEntries(object) {
@@ -59,6 +70,8 @@ class HoverTooltip extends PureComponent {
   _renderContent = info => {
     const {streamName} = info.layer.props;
 
+    console.log('streamName', streamName); // eslint-disable-line
+
     if (!streamName) {
       return (
         <div>
@@ -68,6 +81,10 @@ class HoverTooltip extends PureComponent {
     }
 
     const objectId = info.object.base && info.object.base.object_id;
+    const tags = info.object.base && info.object.base.tags;
+
+    console.log('objectId', objectId); // eslint-disable-line
+    tags && console.log('skip tags', tags); // eslint-disable-line
 
     return [
       <div key="-stream-">
@@ -76,6 +93,7 @@ class HoverTooltip extends PureComponent {
         </div>
         {streamName}
       </div>,
+      <hr key="-separator-" />,
       objectId ? (
         <div key="-id-">
           <div>
@@ -83,8 +101,7 @@ class HoverTooltip extends PureComponent {
           </div>
           {objectId}
         </div>
-      ) : null,
-      <hr key="-separator-" />
+      ) : null
     ].concat(this._renderEntries(info.object.base), this._renderEntries(info.object));
   };
 
