@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -89,6 +90,14 @@ export function getViews(viewMode, options = {}) {
   });
 }
 
+function calDelta(bearing, distance) {
+  const dxx = distance[0] * Math.sin((bearing * Math.PI) / 180);
+  const dxy = distance[0] * Math.cos((bearing * Math.PI) / 180);
+  const dyx = distance[1] * Math.sin((bearing * Math.PI) / 180);
+  const dyy = distance[1] * Math.cos((bearing * Math.PI) / 180);
+  return [dxx + dyx, dxy + dyy];
+}
+
 // Creates viewports that contains information about car position and heading
 export function getViewStates({viewState, trackedPosition, viewMode, offset}) {
   const {name, firstPerson, tracked = {}} = viewMode;
@@ -98,9 +107,17 @@ export function getViewStates({viewState, trackedPosition, viewMode, offset}) {
   if (firstPerson) {
     if (trackedPosition) {
       const bearing = trackedPosition.bearing;
+      const vPosition = firstPerson.position
+        ? [
+            calDelta(trackedPosition.bearing, firstPerson.position)[0],
+            calDelta(trackedPosition.bearing, firstPerson.position)[1],
+            trackedPosition.altitude + firstPerson.position[2]
+          ]
+        : [0, 0, trackedPosition.altitude + 1.3];
       viewState = {
         ...viewState,
         ...firstPerson,
+        position: vPosition,
         longitude: trackedPosition.longitude,
         latitude: trackedPosition.latitude,
         bearing: bearing + offset.bearing
@@ -108,7 +125,7 @@ export function getViewStates({viewState, trackedPosition, viewMode, offset}) {
 
       // Put the tracked object on the ground + 1.3 for vehicle height
       // TODO - support flying vehicle
-      viewState.position = [0, 0, trackedPosition.altitude + 1.3];
+      // viewState.position = [0, 0, trackedPosition.altitude + 1.3];
     }
 
     viewStates[name] = viewState;
@@ -132,7 +149,10 @@ export function getViewStates({viewState, trackedPosition, viewMode, offset}) {
     // Put the tracked object on the ground
     // TODO - support flying vehicle
     if (trackedPosition) {
-      viewState.position = [0, 0, trackedPosition.altitude];
+      // viewState.position = [0, 0, trackedPosition.altitude];
+      viewState.position = viewState.position
+        ? [0, 0, trackedPosition.altitude + viewState.position[2]]
+        : [0, 0, trackedPosition.altitude];
     }
 
     viewStates[name] = offsetViewState(viewState, offset);
