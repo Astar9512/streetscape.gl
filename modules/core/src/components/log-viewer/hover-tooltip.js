@@ -84,7 +84,7 @@ class HoverTooltip extends PureComponent {
     const tags = info.object.base && info.object.base.tags;
 
     console.log('objectId', objectId); // eslint-disable-line
-    tags && console.log('skip tags', tags); // eslint-disable-line
+    if (tags) console.log('skip tags', tags); // eslint-disable-line
 
     return [
       <div key="-stream-">
