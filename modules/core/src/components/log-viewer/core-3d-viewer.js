@@ -74,6 +74,7 @@ export default class Core3DViewer extends PureComponent {
       PropTypes.func
     ]),
     customLayers: PropTypes.array,
+    persistedLayers: PropTypes.array,
     renderObjectLabel: PropTypes.func,
     getTransformMatrix: PropTypes.func,
     viewOptions: PropTypes.object,
@@ -100,6 +101,7 @@ export default class Core3DViewer extends PureComponent {
     viewMode: VIEW_MODE.PERSPECTIVE,
     xvizStyles: {},
     customLayers: [],
+    persistedLayers: [],
     onMapLoad: noop,
     onDeckLoad: noop,
     onViewStateChange: noop,
@@ -245,6 +247,7 @@ export default class Core3DViewer extends PureComponent {
       streamsMetadata,
       objectStates,
       customLayers,
+      persistedLayers,
       getTransformMatrix,
       styleParser
     } = opts;
@@ -306,7 +309,7 @@ export default class Core3DViewer extends PureComponent {
     );
 
     layerList = layerList.concat(
-      customLayers.map(layer => {
+      [...customLayers, ...persistedLayers].map(layer => {
         // Clone layer props
         const {props} = layer;
         const additionalProps = {
@@ -391,6 +394,7 @@ export default class Core3DViewer extends PureComponent {
       objectStates,
       renderObjectLabel,
       customLayers,
+      persistedLayers,
       getTransformMatrix,
       style,
       mapStyle,
@@ -407,6 +411,7 @@ export default class Core3DViewer extends PureComponent {
       streamFilter,
       objectStates,
       customLayers,
+      persistedLayers,
       getTransformMatrix,
       styleParser
     });
